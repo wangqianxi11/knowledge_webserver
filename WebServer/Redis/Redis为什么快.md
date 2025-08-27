@@ -1,0 +1,17 @@
+---
+title: Redis为什么快
+updated: 2025-08-24T10:43:11
+created: 2025-06-13T16:45:32
+---
+
+### Redis为什么这么快？
+- 内存存储：Redis是使用内存(in-memeroy)存储，**没有磁盘IO上的开销。数据存在内存中**，类似于 HashMap，HashMap 的优势就是查找和操作的时间复杂度都是O(1)。
+- 单线程实现（ Redis 6.0以前）：Redis使用单个线程处理请求，避免了多个线程之间线程切换和锁资源争用的开销。注意：单线程是指的是在核心网络模型中，网络请求模块使用一个线程来处理，即一个线程处理所有网络请求。
+- 非阻塞IO：Redis使用多路复用IO技术，将[epoll](https://zhida.zhihu.com/search?content_id=178187577&content_type=Article&match_order=1&q=epoll&zhida_source=entity)作为I/O多路复用技术的实现，再加上Redis自身的事件处理模型将epoll中的连接、读写、关闭都转换为事件，不在网络I/O上浪费过多的时间。
+- 优化的数据结构：Redis有诸多可以直接应用的优化数据结构的实现，应用层可以直接使用原生的数据结构提升性能。
+- 使用底层模型不同：Redis直接自己构建了 VM ([虚拟内存](https://zhida.zhihu.com/search?content_id=178187577&content_type=Article&match_order=1&q=%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98&zhida_source=entity))机制 ，因为一般的系统调用系统函数的话，会浪费一定的时间去移动和请求。  
+  **Redis的VM(虚拟内存)机制就是暂时把不经常访问的数据(冷数据)从内存交换到磁盘中，从而腾出宝贵的内存空间用于其它需要访问的数据(热数据)。**通过VM功能可以实现冷热数据分离，使热数据仍在内存中、冷数据保存到磁盘。这样就可以避免因为内存不足而造成访问速度下降的问题。  
+  **Redis提高数据库容量的办法有两种**：
+  - 一种是可以将数据分割到多个RedisServer上；
+  - 另一种是使用虚拟内存把那些不经常访问的数据交换到磁盘上。
+- 需要特别注意的是Redis并没有使用OS提供的Swap，而是自己实现
