@@ -4,9 +4,9 @@ updated: 2025-06-16T09:48:04
 created: 2025-06-13T16:54:43
 ---
 
-### Redis的数据类型
+## Redis的数据类型
 有五种常用数据类型：String、Hash、Set、List、SortedSet。以及三种特殊的数据类型：Bitmap、HyperLogLog、Geospatial ，其中HyperLogLog、Bitmap的底层都是 String 数据类型，Geospatial 的底层是 Sorted Set 数据类型。
-#### 五种常用的数据类型：
+### 五种常用的数据类型：
 1、**String**：String是最常用的一种数据类型，普通的key- value 存储都可以归为此类。其中Value既可以是数字也可以是字符串。
 - 使用场景：常规key-value缓存应用。常规计数: 微博数， 粉丝数。
 

@@ -4,7 +4,7 @@ updated: 2025-06-16T09:31:02
 created: 2025-06-13T16:49:42
 ---
 
-### Redis相比Memcached有哪些优势？
+## Redis相比Memcached有哪些优势？
 - 数据类型：Memcached所有的值均是简单的字符串，Redis支持更为丰富的数据类型，支持**string(字符串)，list(列表)，Set(集合)、Sorted Set(有序集合)、Hash(哈希)**等。
 
 - 持久化：Redis支持数据落地持久化存储，可以将内存中的数据保持在磁盘中，重启的时候可以再次加载进行使用。 memcache不支持数据持久存储 。

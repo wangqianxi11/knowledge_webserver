@@ -4,7 +4,7 @@ updated: 2025-06-14T14:13:50
 created: 2025-06-14T14:13:39
 ---
 
-**Redis事务相关命令**
+## Redis事务相关命令
 
 Redis事务功能是通过MULTI、EXEC、DISCARD和WATCH 四个原语实现的
 - WATCH 命令是一个乐观锁，可以为 Redis 事务提供 check-and-set （CAS）行为。 可以监控一个或多个键，一旦其中有一个键被修改（或删除），之后的事务就不会执行，监控一直持续到EXEC命令。

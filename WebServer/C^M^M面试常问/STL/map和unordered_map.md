@@ -3,29 +3,37 @@ title: map和unordered_map
 updated: 2025-08-23T15:30:46
 created: 2025-04-15T14:57:57
 ---
+## map和unordered_map
 
+### map
 Map内部实现是一个**红黑树**，**内部所有的元素都是有序的**，而hashmap则是内部实现了一个哈希表，**内部存储元素是无序的**
-**Map优点**：有序性，其次是**内部实现的是一个红黑树**，使得很多操作都可以在logn的复杂度下可以实现效率较高。
-**Map缺点**：空间占用率高
-**Unordered_map优点**：查找效率非常高。缺点：哈希表的建立比较费时间
 
-**红黑树：**
-红黑树是一种**自平衡的二叉查找树**。不是完全平衡，通过一些约束条件来保证树的高度始终在对数范围内，从而保证了
+#### Map优点
+**有序性**，其次是**内部实现的是一个红黑树**，使得很多操作都可以在logn的复杂度下可以实现效率较高。
+#### Map缺点：
+空间占用率高
 
-查找、插入、删除等操作的时间复杂度是O(log n)。
+### unordered_map
+**Unordered_map优点**：查找效率非常高。<br>
+缺点：哈希表的建立比较费时间
+
+### 红黑树：
+红黑树是一种**自平衡的二叉查找树**。不是完全平衡，通过一些约束条件来保证树的高度始终在对数范围内，从而`保证了查找、插入、删除等操作的时间复杂度是O(log n)。`
 - 性能严重依赖于树的形状，插入的数据是有序或接近有序的，BST会退化成 一条链表。
+  
 **红黑树的五大性质（核心规则）：**
 - 节点是红色或黑色
 - 根节点是黑色
 - 所有的叶子节点是黑色的
 - 红色节点的两个子节点都必须是黑色的
 - 从任意一个节点到其所有后代叶子节点的简单路径上，均包含相同输入的黑色节点。
+
 **意义**：相对较低的开销：虽然调整逻辑看起来复杂，但平均的旋转次数较少（插入最多2次，删除最多3次），整体效率很高。
 
-**哈希表:**
+### 哈希表:
 - **是一种数据结构，它提供了快速的插入操作和查找操作，无论哈希表总中有多少条数据，插入和查找的时间复杂度都是为O (1)。**
 
-### 哈希表的底层实现是什么
+#### 哈希表的底层实现是什么
 - **由一个数组和哈希函数实现**
 #### 产生哈希冲突的时候怎么解决
 - **开放寻址法**：
@@ -35,77 +43,106 @@ Map内部实现是一个**红黑树**，**内部所有的元素都是有序的**
 - **链地址法**：
   - 每个数组元素是一个链表头
   - 冲突的键值对存储在对应位置的链表中
-### 有哪些哈希函数
+#### 有哪些哈希函数
 - 除留余数法
-  - ==​h(k)=k mod n;​<sub></sub>==
+  >​h(k)=k mod n;
 - 乘法哈希
-  - ==<sub></sub>​h(k) = floor (m \* (k \* A mod 1))​<sub></sub>==
+  >h(k) = floor (m \* (k \* A mod 1))
 - 平方取中法
 
 #### 哈希表的实现
 **为什么还要使用 list（或链表）构建哈希表？**
 答：**因为哈希冲突（Hash Collision）不可避免**，我们需要一种机制来处理同一个哈希位置上的多个元素。
-<table>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><p>#include &lt;iostream&gt;</p>
-<p>#include &lt;vector&gt;</p>
-<p>#include &lt;list&gt;</p>
-<p>#include &lt;string&gt;</p>
-<p></p>
-<p>using namespace std;</p>
-<p></p>
-<p>class MyHashTable {</p>
-<p>private:</p>
-<p>static const int SIZE = 100; // 哈希表大小</p>
-<p>vector&lt;list&lt;pair&lt;int, string&gt;&gt;&gt; table;</p>
-<p></p>
-<p>int hash(int key) {</p>
-<p>return key % SIZE;</p>
-<p>}</p>
-<p></p>
-<p>public:</p>
-<p>MyHashTable() : table(SIZE) {}</p>
-<p></p>
-<p>// 插入或更新键值对</p>
-<p>void put(int key, const string&amp; value) {</p>
-<p>int idx = hash(key);</p>
-<p>for (auto&amp; p : table[idx]) {</p>
-<p>if (p.first == key) {</p>
-<p>p.second = value;</p>
-<p>return;</p>
-<p>}</p>
-<p>}</p>
-<p>table[idx].push_back({key, value});</p>
-<p>}</p>
-<p></p>
-<p>// 查询值</p>
-<p>string get(int key) {</p>
-<p>int idx = hash(key);</p>
-<p>for (const auto&amp; p : table[idx]) {</p>
-<p>if (p.first == key)</p>
-<p>return p.second;</p>
-<p>}</p>
-<p>return "Key Not Found";</p>
-<p>}</p>
-<p></p>
-<p>// 删除键值对</p>
-<p>void remove(int key) {</p>
-<p>int idx = hash(key);</p>
-<p>for (auto it = table[idx].begin(); it != table[idx].end(); ++it) {</p>
-<p>if (it-&gt;first == key) {</p>
-<p>table[idx].erase(it);</p>
-<p>return;</p>
-<p>}</p>
-<p>}</p>
-<p>}</p>
-<p>};</p></th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+```c++
+
+#include <iostream>
+
+#include <vector>
+
+#include <list>
+
+#include <string>
+
+using namespace std;
+
+class MyHashTable {
+
+private:
+
+static const int SIZE = 100; // 哈希表大小
+
+vector<list<pair<int, string>>> table;
+
+int hash(int key) {
+
+  return key % SIZE;
+
+}
+
+public:
+
+MyHashTable() : table(SIZE) {}
+
+// 插入或更新键值对
+
+void put(int key, const string& value) {
+
+int idx = hash(key);
+
+for (auto& p : table[idx]) {
+
+  if (p.first == key) {
+
+    p.second = value;
+
+    return;
+
+    }
+
+  }
+
+  table[idx].push_back({key, value});
+
+}
+
+// 查询值
+
+string get(int key) {
+
+int idx = hash(key);
+
+for (const auto& p : table[idx]) {
+
+  if (p.first == key)
+
+  return p.second;
+
+  }
+
+  return "Key Not Found";
+
+}
+
+// 删除键值对
+
+void remove(int key) {
+
+int idx = hash(key);
+
+for (auto it = table[idx].begin(); it != table[idx].end(); ++it) {
+
+  if (it->first == key) {
+
+    table[idx].erase(it);
+
+    return;
+
+    }
+
+  }
+
+}
+
+};
+```
 

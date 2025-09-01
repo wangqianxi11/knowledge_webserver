@@ -32,20 +32,13 @@ vector是顺序容器，map、unordered_map叫关联类容器
 **2. 算法（Algorithms）**
 STL 提供了 **60+ 常用算法函数**，如查找、排序、复制、变换、组合、计数等。
 **示例：**
-<table>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><p>std::sort(vec.begin(), vec.end());</p>
-<p>std::find(vec.begin(), vec.end(), 42);</p>
-<p>std::count_if(vec.begin(), vec.end(), [](int x){ return x &gt; 0; });</p></th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+```c++
+std::sort(vec.begin(), vec.end());
+
+std::find(vec.begin(), vec.end(), 42);
+
+std::count_if(vec.begin(), vec.end(), [](int x){ return x > 0; });
+```
 **3. 迭代器（Iterators）**
 迭代器是 STL 容器与算法之间的桥梁。每种容器都定义了自己的迭代器类型。
 **常见类型：**
@@ -59,23 +52,20 @@ STL 提供了 **60+ 常用算法函数**，如查找、排序、复制、变换�
 
 **4. 仿函数（Functors）**
 本质是**重载了 operator() 的类**，也称为“函数对象”。可以将其作为自定义逻辑传给算法。
-<table>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><p>struct Greater {</p>
-<p>bool operator()(int a, int b) const {</p>
-<p>return a &gt; b;</p>
-<p>}</p>
-<p>};</p>
-<p>std::sort(vec.begin(), vec.end(), Greater());</p></th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+```c++
+
+struct Greater {
+
+bool operator()(int a, int b) const {
+
+return a > b;
+
+}
+
+};
+
+std::sort(vec.begin(), vec.end(), Greater());
+```
 **5. 适配器（Adaptors）**
 适配器是对容器、函数或迭代器的功能扩展或封装。
 **容器适配器：**
@@ -87,6 +77,9 @@ STL 提供了 **60+ 常用算法函数**，如查找、排序、复制、变换�
 - insert_iterator（如 back_inserter）
 **函数适配器：**
 - std::bind, std::function, std::not1
+  
 **6. 内存分配器（Allocators）**
 控制容器如何申请、管理和释放内存。默认是 std::allocator，也可以自定义。
-std::vector\<int, MyCustomAllocator\<int\>\> v;
+```c++
+std::vector<int, MyCustomAllocator<int>> v;
+```

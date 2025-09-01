@@ -4,180 +4,111 @@ updated: 2025-08-22T16:22:55
 created: 2025-04-15T15:24:41
 ---
 
-# 核心作用是定义常量，并强制实施常量正确性，即某个对象的值初始化后不应该被修改。
+## 核心作用是定义常量，并强制实施常量正确性，即某个对象的值初始化后不应该被修改。
 1.  安全性：这是最重要的原因。它**防止了程序中对重要数据的意外修改**。编译器会在编译阶段就帮你抓住这些错误。
 2.  可读性与可维护性：const就像一种文档，清晰地表明了程序中哪些值是不变的，哪些函数不会修改对象状态。
 3.  优化机会：编译器知道某些值是不变的，可以利用这一点进行优化，生成更高效的代码。
 4.  使 const 对象成为可能：没有const成员函数，const对象将几乎无法使用，因为它们不能调用任何会修改自身状态的函数。
-# const 修饰变量
+### const 修饰变量
 当const修饰变量时，该变量将被视为只读变量，即不能被修改。
 对于确定不会被修改的变量，应该加上 const，这样可以保证变量的值不会被无意中修改，也可以使编译器在代码优化时更加智能。
 例如：
-<table>
-<colgroup>
-<col style="width: 17%" />
-<col style="width: 82%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><p>1</p>
-<p>2</p></th>
-<th><p>const int a = 10</p>
-<p>a = 20; // 编译错误，a 是只读变量，不能被修改</p></th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
-# const 修饰函数参数，表示函数不会修改参数
+```c++
+const int a = 10
+
+a = 20; // 编译错误，a 是只读变量，不能被修改
+```
+## const 修饰函数参数，表示函数不会修改参数
 const 修饰函数参数，表示函数不会修改参数
-<table>
-<colgroup>
-<col style="width: 100%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><p>当const修饰函数参数时，表示函数内部不会修改该参数的值。这样做可以使代码更加安全，避免在函数内部无意中修改传入的参数值。</p>
-<p>尤其是 引用 作为参数时，如果确定不会修改引用，那么一定要使用 const 引用。</p>
-<p>例如：</p>
-<p>void func(const int a) {</p>
-<p>// 编译错误，不能修改 a 的值</p>
-<p>a = 10;</p>
-<p>}</p></th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
-# const 修饰函数返回值
+
+当const修饰函数参数时，表示函数内部不会修改该参数的值。这样做可以使代码更加安全，避免在函数内部无意中修改传入的参数值。
+
+尤其是 引用 作为参数时，如果确定不会修改引用，那么一定要使用 const 引用。
+例如：
+
+```c++
+void func(const int a) {
+
+// 编译错误，不能修改 a 的值
+
+a = 10;
+
+}
+```
+## const 修饰函数返回值
 当const修饰函数返回值时，表示函数的返回值为只读，不能被修改。这样做可以使函数返回的值更加安全，避免被误修改。
 例如：
-<table>
-<colgroup>
-<col style="width: 16%" />
-<col style="width: 83%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><p>1</p>
-<p>2</p>
-<p>3</p>
-<p>4</p>
-<p>5</p>
-<p>6</p>
-<p>7</p>
-<p>8</p>
-<p>9</p></th>
-<th><p>const int func() {</p>
-<p>int a = 10;</p>
-<p>return a;</p>
-<p>}</p>
-<p>int main() {</p>
-<p>const int b = func(); // b 的值为 10，不能被修改</p>
-<p>b = 20; // 编译错误，b 是只读变量，不能被修改</p>
-<p>return 0;</p>
-<p>}</p></th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
-# 4. const 修饰指针或引用
+```c++
+const int func() {
+
+    int a = 10;
+
+    return a;
+
+}
+
+int main() {
+
+    const int b = func(); // b 的值为 10，不能被修改
+
+    b = 20; // 编译错误，b 是只读变量，不能被修改
+
+    return 0;
+
+}
+```
+## 4. const 修饰指针或引用
 在 C/C++ 中，const 关键字可以用来修饰指针，用于声明指针本身为只读变量或者指向只读变量的指针。
 根据 const 关键字的位置和类型，可以将 const 指针分为以下三种情况：
-## 4.1. 指向只读变量的指针
+### 4.1. 指向只读变量的指针
 这种情况下，const 关键字修饰的是指针所指向的变量，而不是指针本身。
 因此，指针本身可以被修改（意思是指针可以指向新的变量），但是不能通过指针修改所指向的变量。
-<table>
-<colgroup>
-<col style="width: 12%" />
-<col style="width: 87%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><p>1</p>
-<p>2</p>
-<p>3</p>
-<p>4</p>
-<p>5</p>
-<p>6</p></th>
-<th><p>const int* p; // 声明一个指向只读变量的指针，可以指向 int 类型的只读变量</p>
-<p>int a = 10;</p>
-<p>const int b = 20;</p>
-<p>p = &amp;a; // 合法，指针可以指向普通变量</p>
-<p>p = &amp;b; // 合法，指针可以指向只读变量</p>
-<p>*p = 30; // 非法，无法通过指针修改只读变量的值</p></th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
-## 4.2 只读指针
+```c++
+const int* p; // 声明一个指向只读变量的指针，可以指向 int 类型的只读变量
+
+int a = 10;
+
+const int b = 20;
+
+p = &a; // 合法，指针可以指向普通变量
+
+p = &b; // 合法，指针可以指向只读变量
+
+*p = 30; // 非法，无法通过指针修改只读变量的值
+```
+### 4.2 只读指针
 这种情况下，const 关键字修饰的是指针本身，使得指针本身成为只读变量。
 因此，指针本身不能被修改（即指针一旦初始化就不能指向其它变量），但是可以通过指针修改所指向的变量。
-<table>
-<colgroup>
-<col style="width: 16%" />
-<col style="width: 83%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><p>1</p>
-<p>2</p>
-<p>3</p>
-<p>4</p>
-<p>5</p></th>
-<th><p>int a = 10;</p>
-<p>int b = 20;</p>
-<p>int* const p = &amp;a; // 声明一个只读指针，指向 a</p>
-<p>*p = 30; // 合法，可以通过指针修改 a 的值</p>
-<p>p = &amp;b; // 非法，无法修改只读指针的值</p></th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+```c++
+int a = 10;
+
+int b = 20;
+
+int* const p = &a; // 声明一个只读指针，指向 a
+
+*p = 30; // 合法，可以通过指针修改 a 的值
+
+p = &b; // 非法，无法修改只读指针的值
+```
 在上面的例子中，我们使用int\* const声明了一个只读指针p，指向变量a。我们可以通过指针修改a的值，但是无法修改指针的值。
-## 4.3 只读指针指向只读变量
+### 4.3 只读指针指向只读变量
 这种情况下，const 关键字同时修饰了指针本身和指针所指向的变量，使得指针本身和所指向的变量都成为只读变量。
 因此，指针本身不能被修改，也不能通过指针修改所指向的变量。
-<table>
-<colgroup>
-<col style="width: 13%" />
-<col style="width: 86%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><p>1</p>
-<p>2</p>
-<p>3</p>
-<p>4</p></th>
-<th><p>const int a = 10;</p>
-<p>const int* const p = &amp;a; // 声明一个只读指针，指向只读变量 a</p>
-<p>*p = 20; // 非法，无法通过指针修改只读变量的值</p>
-<p>p = nullptr; // 非法，无法修改只读指针的值</p></th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
-## 4.4 常量引用
+```c++
+const int a = 10;
+
+const int* const p = &a; // 声明一个只读指针，指向只读变量 a
+
+*p = 20; // 非法，无法通过指针修改只读变量的值
+
+p = nullptr; // 非法，无法修改只读指针的值
+```
+### 4.4 常量引用
 常量引用是指引用一个只读变量的引用，因此不能通过常量引用修改变量的值。
-<table>
-<colgroup>
-<col style="width: 15%" />
-<col style="width: 84%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><p>1</p>
-<p>2</p>
-<p>3</p></th>
-<th><p>const int a = 10;</p>
-<p>const int&amp; b = a; // 声明一个常量引用，引用常量 a</p>
-<p>b = 20; // 非法，无法通过常量引用修改常量 a 的值</p></th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+```c++
+const int a = 10;
+
+const int& b = a; // 声明一个常量引用，引用常量 a
+
+b = 20; // 非法，无法通过常量引用修改常量 a 的值
+```
