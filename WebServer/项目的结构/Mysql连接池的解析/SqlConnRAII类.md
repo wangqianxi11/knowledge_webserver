@@ -23,78 +23,58 @@ RAII的原理：
 - 在析构函数中执行销毁操作、比如释放内存、关闭文件、释放锁
 - 使用时，声明一个该对象的类
 
-**RAII模式构造时资源获取，析构时资源释放，只负责连接生命周期管理，不涉及具体数据库操作**
-<table>
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 89%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><p>1</p>
-<p>2</p>
-<p>3</p>
-<p>4</p>
-<p>5</p>
-<p>6</p>
-<p>7</p>
-<p>8</p>
-<p>9</p>
-<p>10</p>
-<p>11</p>
-<p>12</p>
-<p>13</p>
-<p>14</p>
-<p>15</p>
-<p>16</p>
-<p>17</p>
-<p>18</p>
-<p>19</p>
-<p>20</p>
-<p>21</p>
-<p>22</p>
-<p>23</p>
-<p>24</p>
-<p>25</p>
-<p>26</p>
-<p>27</p></th>
-<th><p>#ifndef SQLCONNRAII_H</p>
-<p>#define SQLCONNRAII_H</p>
-<p>#include "sqlconnpool.h"</p>
-<p></p>
-<p>/* 资源在对象构造初始化 资源在对象析构时释放*/</p>
-<p>class SqlConnRAII {</p>
-<p>public:</p>
-<p></p>
-<p>// 构造函数：执行资源的初始化</p>
-<p>SqlConnRAII(MYSQL** sql, SqlConnPool *connpool) {</p>
-<p>*sql = connpool-&gt;GetConn(); // 获取连接</p>
-<p>sql_ = *sql; // 保存连接指针</p>
-<p>connpool_ = connpool; // 保存连接池指针</p>
-<p>}</p>
-<p></p>
-<p></p>
-<p>// 析构函数：执行销毁操作</p>
-<p>~SqlConnRAII() {</p>
-<p>if(sql_) { connpool_-&gt;FreeConn(sql_); } // 不为空指针，则归还连接</p>
-<p>}</p>
-<p>private:</p>
-<p>MYSQL *sql_;</p>
-<p>SqlConnPool* connpool_;</p>
-<p>};</p>
-<p></p>
-<p>#endif //SQLCONNRAII_H</p></th>
-</tr>
-</thead>
-<tbody>
-</tbody>
-</table>
+### RAII模式构造时资源获取，析构时资源释放，只负责连接生命周期管理，不涉及具体数据库操作
+```c++
+#ifndef SQLCONNRAII_H
+
+#define SQLCONNRAII_H
+
+#include "sqlconnpool.h"
+
+/* 资源在对象构造初始化 资源在对象析构时释放*/
+
+class SqlConnRAII {
+
+public:
+
+// 构造函数：执行资源的初始化
+
+    SqlConnRAII(MYSQL** sql, SqlConnPool *connpool) {
+
+        *sql = connpool->GetConn(); // 获取连接
+
+        sql_ = *sql; // 保存连接指针
+
+        connpool_ = connpool; // 保存连接池指针
+
+    }
+
+// 析构函数：执行销毁操作
+
+    ~SqlConnRAII() {
+
+        if(sql_) { connpool_->FreeConn(sql_); } // 不为空指针，则归还连接
+
+    }
+
+private:
+
+    MYSQL *sql_;
+
+    SqlConnPool* connpool_;
+
+};
+
+#endif //SQLCONNRAII_H
+```
 
 ### 一、为什么使用 RAII 管理数据库连接？
 **1. 自动释放资源，避免泄漏**
 数据库连接是一种昂贵的资源，如果使用后没有手动释放（归还给连接池），将导致连接耗尽。RAII 通过对象生命周期自动释放资源，不依赖程序员手动 release()。
+
 **2. 异常安全**
 如果中途抛出异常，比如 SQL 查询异常，手动释放连接的代码可能不会执行。而 RAII 的析构函数会自动被调用，确保资源释放。
+
 **3. 逻辑清晰，易于维护**
 RAII 模板将“获取”和“释放”操作封装在一个类中，调用者只需获取连接，其他交由类本身管理，提高代码可读性和稳定性。
 
