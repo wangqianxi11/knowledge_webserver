@@ -4,13 +4,15 @@ updated: 2025-04-06T17:18:39
 created: 2025-04-06T16:59:14
 ---
 
-#  工作流程：
-1、线程池创建时启动多少工作线程
-2、工作线程等待任务或关闭信号
-3、通过AddTask添加的任务会被工作线程取出执行
-4、析构时通知所有线程停止工作
+# 工作流程：
 
-### 结构体pool，封装了线程池所需的所有共享数据
+1、线程池创建时启动多少工作线程<br>
+2、工作线程等待任务或关闭信号<br>
+3、通过 AddTask 添加的任务会被工作线程取出执行<br>
+4、析构时通知所有线程停止工作<br>
+
+### 结构体 pool，封装了线程池所需的所有共享数据
+
 ```c++
 struct Pool {
 
@@ -26,6 +28,7 @@ struct Pool {
 ```
 
 ### 构造函数实现了一个线程池：
+
 - **创建指定数量的工作线程**
 - **每个线程执行一个无限循环：**
 
@@ -36,7 +39,9 @@ struct Pool {
 **3、无任务则等待变量通知**
 
 **4、线程池关闭则退出循环**
-- **使用detach()式工作线程和主线程分离**
+
+- **使用 detach()式工作线程和主线程分离**
+
 ```c++
 explicit ThreadPool(size_t threadCount = 8): pool_(std::make_shared<Pool>()) {
 
@@ -50,15 +55,15 @@ explicit ThreadPool(size_t threadCount = 8): pool_(std::make_shared<Pool>()) {
 
         if(!pool->tasks.empty()) { // 如果任务队列非空
 
-        auto task = std::move(pool->tasks.front()); // 取出任务
+            auto task = std::move(pool->tasks.front()); // 取出任务
 
-        pool->tasks.pop(); // 移除任务
+            pool->tasks.pop(); // 移除任务
 
-        locker.unlock(); // 释放锁，允许其他线程访问队列
+            locker.unlock(); // 释放锁，允许其他线程访问队列
 
-        task(); // 执行任务
+            task(); // 执行任务
 
-        locker.lock(); // 重新获取锁
+            locker.lock(); // 重新获取锁
 
         }
 
@@ -66,14 +71,16 @@ explicit ThreadPool(size_t threadCount = 8): pool_(std::make_shared<Pool>()) {
 
     else pool->cond.wait(locker); // 否则，等待新任务
 
-    }
+        }
 
     }).detach(); // 线程分离，主线程不会等待工作线程结束，如果主线程退出，工作线程仍会继续运行（造成资源泄露）
 
     }
 }
 ```
+
 ### 提供默认构造和移动构造，移动构造允许线程池对象资源转移
+
 ```c++
 ThreadPool() = default;
 
@@ -81,10 +88,11 @@ ThreadPool(ThreadPool&&) = default;
 ```
 
 **析构函数，**
+
 ```c++
 ~ThreadPool() {
 
-if(static_cast<bool>(pool_)) 
+if(static_cast<bool>(pool_))
 {
 
 {
@@ -103,6 +111,7 @@ if(static_cast<bool>(pool_))
 ```
 
 ### 向任务队列添加新任务
+
 ```c++
 template<class F>
 
