@@ -185,9 +185,9 @@ epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event);
 ### epoll 调用的基本流程
 
 ```c++
-int epfd = epoll_create(); // 创建 epoll 实例</p>
-epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &amp;event); // 注册事件</p>
-int n = epoll_wait(epfd, events, maxevents, -1); // 等待事件</p></th>
+int epfd = epoll_create(); // 创建 epoll 实例
+epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &amp;event); // 注册事件
+int n = epoll_wait(epfd, events, maxevents, -1); // 等待事件
 ```
 
 | **操作**                   | **属于**                   | **描述**                                         |
@@ -201,6 +201,53 @@ int n = epoll_wait(epfd, events, maxevents, -1); // 等待事件</p></th>
 在 epoll 中，**事件注册和监听是通过系统调用进入内核态完成的，而事件处理和业务逻辑运行在用户态。**
 
 epoll_wait() 是 epoll 最关键的内核态阻塞调用，一旦有事件发生，它将返回用户态处理。
+
+### epoll函数解析
+#### 1.epoll_create/epoll_create1
+epoll_create 创建一个 epoll 实例，并返回一个文件描述符，应用程序通过该文件描述符与内核进行交互。
+```c++
+int epoll_create(int size);
+int epoll_create1(int flags);  // 推荐使用 epoll_create1
+/*
+@size: 在较老版本的 epoll_create 中，size 是指定用于内核内部数据结构大小的一个提示参数，但在现代版本中已经没有实际意义。
+
+@flags: 用于指定标志，如 EPOLL_CLOEXEC。
+*/
+```
+#### 2.epoll_ctl
+epoll_ctl 用于控制 epoll 实例的行为，主要用于注册、修改和删除文件描述符。
+```c++
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+/*
+@epfd：由 epoll_create 或 epoll_create1 返回的 epoll 文件描述符。
+
+@op：操作类型，可以是以下之一：
+
+  EPOLL_CTL_ADD：添加文件描述符到 epoll 实例中。
+
+  EPOLL_CTL_MOD：修改已注册的文件描述符的事件。
+
+  EPOLL_CTL_DEL：从 epoll 实例中删除文件描述符。
+
+@fd：要操作的文件描述符。
+
+@event：监听的事件，struct epoll_event 结构体，其中包含了要监听的事件（如 EPOLLIN、EPOLLOUT 等）和用户数据。
+*/
+```
+#### 3.epoll_wait
+`epoll_wait` 用于等待事件的发生，并返回就绪的文件描述符。
+```c++
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
+/*
+@epfd：由 epoll_create 返回的 epoll 文件描述符。
+
+@events：接收事件的数组，epoll_wait 将把就绪的文件描述符及其对应的事件放到该数组中。
+
+@maxevents：一次最多返回的就绪事件的数量。
+
+@timeout：等待事件的最大时间（单位：毫秒），可以设置为 -1 表示阻塞直到有事件发生，0 表示非阻塞，其他正值表示超时等待。
+*/
+```
 
 ### 同步和异步
 
