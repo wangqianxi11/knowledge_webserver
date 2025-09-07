@@ -8,7 +8,10 @@ grep擅长查找功能，sed擅长取行和替换，awk擅长取列
 
 # 1.1 grep
 - grep: 过滤
-<span class="mark">grep \[OPTIONS\] PATTERN \[FILE...\]  
+```bash
+grep [OPTIONS] PATTERN [FILE...]  
+```
+```bash
 --color=auto 对匹配到的文本着色显示  
 -v 显示不被pattern匹配到的行  
 -i 忽略字符大小写  
@@ -24,13 +27,18 @@ grep –e ‘cat ’ -e ‘dog’ file
 -w 匹配整个单词  
 -E 使用ERE,相当于egrep  
 -F 相当于fgrep，不支持正则表达式</span>
-
-==eg: 包含root: grep -n root==
-
+```
+eg: 包含root: 
+```bash
+grep -n root
+```
 # 1.2 sed
 - sed: 取行进行 打印、替换
-<span class="mark">sed \[option\]... 'script' inputfile  
+```bash
+sed [option]... 'script' inputfile  
+```
 选项  
+```bash
 -n 不输出模式空间内容到屏幕，即不自动打印  
 -e 多点编辑  
 -f /PATH/SCRIPT_FILE: 从指定文件中读取编辑脚本  
@@ -65,7 +73,7 @@ s///：查找替换,支持使用其它分隔符，s@@@，s###
 g 行内全局替换  
 p 显示替换成功的行  
 w /PATH/TO/SOMEFILE 将替换成功的行保存至文件中</span>
-
+```
 eg: 打印第2行: sed -n 2p passwd
 
 # 1.3 awk
