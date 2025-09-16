@@ -182,7 +182,7 @@ epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &event);
 - epoll 同时支持水平和边缘触发
 - **收到信号通知后，如果读缓冲区已经读取了还剩余数据，水平触发会再次通知，而边缘触发不会**
 
-### epoll 调用的基本流程
+## epoll 调用的基本流程
 
 ```c++
 int epfd = epoll_create(); // 创建 epoll 实例
@@ -248,6 +248,44 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 @timeout：等待事件的最大时间（单位：毫秒），可以设置为 -1 表示阻塞直到有事件发生，0 表示非阻塞，其他正值表示超时等待。
 */
 ```
+### epoll如何报告连接断开
+当使用 epoll 时，连接断开主要通过以下两种方式在 `epoll_event.events` 字段中体现：
+
+```EPOLLHUP (Hang Up) 和 EPOLLRDHUP (Read Hang Up)```
+
+```EPOLLRDHUP (Since Linux 2.6.17)：```
+这是**最常用、最明确的信号**。 它表示对端已经**优雅地关闭（shutdown） 了连接**，即发送了 FIN 包。这通常对应于 recv() 返回 0 的情况。你需要在注册事件时显式地使用 `EPOLLRDHUP` 标志。
+
+```EPOLLHUP：```
+表示发生了**挂断**。这是一个更通用的错误指示，通常意味着连接已经彻底断开（无论是优雅关闭还是异常关闭）。<b>注意：当 `EPOLLHUP` 被设置时，Socket可能已经不可读也不可写。</b>根据 Linux man page，当对端关闭写操作后，EPOLLHUP 和 EPOLLIN 可能会一起被设置。
+
+```EPOLLERR (Error)```
+表示Socket上发生了**异步错误**。这是检测连接**异常断开（如RST包、网络超时）的主要方式**。当 `EPOLLERR` 被设置时，Socket既是可读的也是可写的（为了让你去读取错误信息），但尝试对其进行I/O操作将会失败或返回错误。
+
+#### 使用 getsockopt() 获取 SO_ERROR,获取具体的故障码 (errno)
+**常见的故障码 (errno) 及其含义**
+
+通过 ```getsockopt(fd, SOL_SOCKET, SO_ERROR, ...) ```获取到的 `error_code` 可能是以下值：
+
+<style>
+table th:first-of-type {
+    width: 4cm;
+}
+table th:nth-of-type(2) {
+    width: 150pt;
+}
+table th:nth-of-type(3) {
+    width: 20cm;
+}
+</style>
+|错误码 (errno)|  含义  |	常见场景|
+ :-------------: | :---------------------|:------------------|
+|ECONNRESET|	连接被对端重置	|最常见的异常断开。对端进程崩溃、强制杀死、或Socket未正常关闭而直接退出。对端发送了RST包。
+|ETIMEDOUT	|连接超时|	尝试建立TCP连接时超时，或者TCP Keep-Alive探测失败。
+|EPIPE|	管道破裂|	尝试向一个已被对端关闭的Socket写入数据。
+|ENETDOWN / ENETUNREACH|	网络不可达|	本地网络接口故障、路由器问题。
+|EHOSTUNREACH	|主机不可达	|找不到到达目标主机的路由。
+|ECONNREFUSED|	连接被拒绝	|对端目标端口没有进程在监听。（通常发生在connect时，但异步错误也可能报告）
 
 ### 同步和异步
 
