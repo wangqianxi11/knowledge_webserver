@@ -1,4 +1,4 @@
-## I²C（Inter-Integrated Circuit）总线是由Philips公司（现NXP Semiconductors）开发的一种两线式串行总线协议
+## I²C（Inter-Integrated Circuit）总线是由Philips公司（现NXP Semiconductors）开发的一种两线式同步串行总线协议
 用于连接低速的微控制器、传感器、EEPROM、A/D转换器、D/A转换器、I/O扩展器等设备。I²C以其简单性、成本效益和多功能性而闻名，广泛应用于各种电子设备中，尤其是空间受限的便携式设备。
 
 ### I²C的信号线：

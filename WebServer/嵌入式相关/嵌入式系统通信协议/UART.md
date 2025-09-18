@@ -1,4 +1,4 @@
-## UART（Universal Asynchronous Receiver/Transmitter）是一种用于串行通信的协议
+## UART（Universal Asynchronous Receiver/Transmitter）是一种用于异步串行通信的协议
 常用于微控制器、计算机和外围设备之间的数据传输。UART允许设备通过**两条主要的信号线进行全双工通信**，这两条线分别是TXD（发送数据）和RXD（接收数据）。在更复杂的设置中，可能还会包含额外的控制和握手信号线。
 
 ### UART的特点：
