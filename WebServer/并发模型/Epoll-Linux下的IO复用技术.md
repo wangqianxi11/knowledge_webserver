@@ -56,19 +56,19 @@ epoll 是一种 I/O 事件通知机制，是 linux 内核实现 I/O 多路复用
 ```c++
 struct eventpoll{
 
-spin_lock_t lock; // 对本数据结构的访问
+  spin_lock_t lock; // 对本数据结构的访问
 
-struct mutex mtx; // 防止使用时被删除
+  struct mutex mtx; // 防止使用时被删除
 
-wait_queue_head_t wq; // sys_epoll_wait()使用的等待队列
+  wait_queue_head_t wq; // sys_epoll_wait()使用的等待队列
 
-wait_queue_head_t poll_wait; //file-\>poll()使用的等待队列
+  wait_queue_head_t poll_wait; //file-\>poll()使用的等待队列
 
-struct list_head rdlist; //事件满足条件的链表
+  struct list_head rdlist; //事件满足条件的链表
 
-struct rb_root rbr; // 用于管理所有fd的红黑树
+  struct rb_root rbr; // 用于管理所有fd的红黑树
 
-struct epitem \*ovflist; // 将事件到达的fd进行链接起来发送至用户空间
+  struct epitem \*ovflist; // 将事件到达的fd进行链接起来发送至用户空间
 
 }
 ```
@@ -76,7 +76,7 @@ struct epitem \*ovflist; // 将事件到达的fd进行链接起来发送至用�
 epoll_create 创建额外的文件描述符，来唯一标识内核中的这个内核事件表（eventpoll 对象）
 
 ```c++
-# include\<sys/epoll.h\>
+# include<sys/epoll.h>
 
 int epoll_create(int size);
 
@@ -95,11 +95,11 @@ int epoll_create(int size);
 ![image5](../../resources/0a518097382c4d84b369451a6dfb852b.png)
 
 ```c++
-\# include\<sys/epoll.h\>
+# include<sys/epoll.h>
 
-int epoll_ctl(int epfd, int op, int fd, struct epoll_event \*event);
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
 
-/\*
+/*
 
 @epfd: epoll_create()的返回值
 
@@ -117,9 +117,9 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event \*event);
 ```c++
 struct epoll_event{
 
-\_uint32_t event; // Epoll事件
+  _uint32_t event; // Epoll事件
 
-epoll_data_t data; // 用户数据
+  epoll_data_t data; // 用户数据
 
 }
 - EPOLLIN：可读取非高优先级数据（重要，必用）
@@ -137,13 +137,13 @@ data 成员用于存储用户数据，类型 epoll_data_t 的定义如下：
 ```c++
 typedef union epoll_data{
 
-void \*ptr; //指定与fd相关的用户数据
+  void *ptr; //指定与fd相关的用户数据
 
-int fd; // 指定事件所从属的目标文件描述符
+  int fd; // 指定事件所从属的目标文件描述符
 
-uint32_t u32;
+  uint32_t u32;
 
-uint64_t u64;
+  uint64_t u64;
 
 }epoll_data_t;
 
@@ -167,10 +167,11 @@ eventpoll 对象相当于是 socket 和进程之间的中介，socket 的数据�
   epoll_wait 在一段超时时间内等待一组文件描述符上的事件，阻塞等待注册的事件发生，返回事件的数目。
 
 ```c++
-# include\<sys/epoll.h\>
+# include<sys/epoll.h>
 
-int epoll_wait(int epfd, struct epoll_event \*events, int maxevents, int timeout);
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout);
 
+/*
 @epfd：epoll_create()的返回值
 
 @events：用来记录被触发的events，大小受制于maxevents
@@ -183,9 +184,10 @@ timeout = -1：调用一直阻塞，直到有文件描述符进入ready状态或
 
 timeout = 0：用于非阻塞检测是否有描述符处于ready状态，不管结果如何，调用都立即返回
 
-timeout \> 0: 调用将最多持续timeout时间，如果期间检测对象变为ready或者捕获到信号则返回，否则直到超时。
+timeout > 0: 调用将最多持续timeout时间，如果期间检测对象变为ready或者捕获到信号则返回，否则直到超时。
 
 @return：成功：返回就绪的文件描述符个数;失败：-1
+*/
 ```
 
 timeout 设计：
@@ -227,55 +229,55 @@ for ( int i = 0; i < number; i++ )
 
 {
 
-int sockfd = events[i].data.fd;
+  int sockfd = events[i].data.fd;
 
-if ( sockfd == listenfd )
+  if ( sockfd == listenfd )
 
-{
+  {
 
-struct sockaddr_in client_address;
+    struct sockaddr_in client_address;
 
-socklen_t client_addrlength = sizeof( client_address );
+    socklen_t client_addrlength = sizeof( client_address );
 
-int connfd = accept( listenfd, ( struct sockaddr\* )&client_address, &client_addrlength );
+    int connfd = accept( listenfd, ( struct sockaddr\* )&client_address, &client_addrlength );
 
-addfd( epollfd, connfd, false );
+    addfd( epollfd, connfd, false );
 
-}
+  }
 
-else if ( events\[i\].events & EPOLLIN )
+  else if ( events[i].events & EPOLLIN )
 
-{
+  {
 
-//只要socket读缓存中还有未读出的数据，这段代码就被触发
+    //只要socket读缓存中还有未读出的数据，这段代码就被触发
 
-printf( "event trigger once\n" );
+    printf( "event trigger once\n" );
 
-memset( buf, '\0', BUFFER_SIZE );
+    memset( buf, '\0', BUFFER_SIZE );
 
-int ret = recv( sockfd, buf, BUFFER_SIZE-1, 0 );
+    int ret = recv( sockfd, buf, BUFFER_SIZE-1, 0 );
 
-if( ret <= 0 )
+    if( ret <= 0 )
 
-{
+    {
 
-close( sockfd );
+      close( sockfd );
 
-continue;
+      continue;
 
-}
+    }
 
-printf( "get %d bytes of content: %s\n", ret, buf );
+    printf( "get %d bytes of content: %s\n", ret, buf );
 
-}
+  }
 
-else
+  else
 
-{
+  {
 
-printf( "something else happened \n" );
+  printf( "something else happened \n" );
 
-}
+  }
 
 }
 
